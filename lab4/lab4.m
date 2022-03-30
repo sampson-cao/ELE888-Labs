@@ -10,8 +10,6 @@ figure, imshow(imageData);
 x = reshape(imageData, length(imageData) * width(imageData), 3);
 x = double(x);
 
-figure, plot3(x(:, 1), x(:, 2), x(:, 3), '.', 'Color', [0.5 0.1 0.8]);
-
 % initialize n, k, mean, and distance
 n = length(imageData) * width(imageData);
 k = 5;
@@ -53,14 +51,15 @@ for iteration = 1:5
     J(iteration) = sum(d, 'all');
 
     for (c = 1:k)
-        avg = [];
+        % if the class is empty (mean is not applicable), move the mean to
+        % a new random spot
         if (isempty(classes{c}))
-            new_u = [new_u, u(c, :)];
-            %new_u = [new_u; rand(1, 3) * 255]
-            %disp('Choosing new random mean for class')
-            %disp(c);
+            new_u = [new_u; rand(1, 3) * 255]
+            disp('Choosing new random mean for class')
+            disp(c);
+        else
+            new_u = [new_u; mean(classes{c})];
         end
-        new_u = [new_u; mean(classes{c})];
     end
 
     if (u == new_u)
@@ -82,7 +81,22 @@ end
 
 
 
+%% Plot RGB map
+figure();
+hold on;
 
+leg = [];
+
+for j = 1:k
+    scatter3(classes{j}(:, 1),classes{j}(:, 2), classes{j}(:, 3), 36, [u(j, :)/255]);
+    leg = [leg {append('class ', int2str(j))}];
+end
+legend(leg);
+title('RGB Map of house image');
+xlabel('R');
+ylabel('G');
+zlabel('B');
+hold off;
 
 
 
